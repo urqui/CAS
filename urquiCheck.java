@@ -1,5 +1,7 @@
 package org.jasig.cas.adaptors.jdbc;
 
+import java.security.SecureRandom;
+
 /**
  *
  * @author Kinesis Identity Security System Inc.
@@ -22,7 +24,12 @@ public class urquiCheck {
 
         String txData = plaintext.toString();  // convert back to string.
         
-        Encryptor myenc = new Encryptor(mykey);  //  initialize encryption with key.
+         // generate new iv. 
+         byte[] iv = new byte[16];
+         SecureRandom random = new SecureRandom();    
+         random.nextBytes(iv);
+        
+        Encryptor myenc = new Encryptor(mykey,iv);  //  initialize encryption with key and iv.
 
         byte ciphertext[] = myenc.encrypt(txData);  // encrypt text for transmission
 

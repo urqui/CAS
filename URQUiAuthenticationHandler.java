@@ -25,10 +25,9 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import javax.validation.constraints.NotNull;
 
 /**
- * Class that if provided a query that returns a password (parameter of query
- * must be username) will compare that password to a translated version of the
- * password provided by the user. If they match, then authentication succeeds.
- * Default password translator is plaintext translator.
+ * Class that if provided a query that returns a RQUi (parameter of query
+ * must be username) will do one time password validation by using URQUi software
+ * If they match, then authentication succeeds.
  *
  * @author Jonathan Bell
  * @version $Revision$ $Date$
@@ -44,35 +43,24 @@ public class URQUiAuthenticationHandler extends AbstractJdbcUsernamePasswordAuth
 
     @NotNull
     private String urquiid;
-    
+
     @NotNull
     private String urquikey;
 
     protected final boolean authenticateUsernamePasswordInternal(final UsernamePasswordCredentials credentials) throws AuthenticationException {
         final String username = getPrincipalNameTransformer().transform(credentials.getUsername());
-        final String password = credentials.getPassword();
-        final String encryptedPassword = this.getPasswordEncoder().encode(
-                password);
+        final String password = credentials.getPassword();   // This will be URQUi
 
         try {
-            final String dbPassword = getJdbcTemplate().queryForObject(this.sql, String.class, username);
+            final String dbRQUi = getJdbcTemplate().queryForObject(this.sql, String.class, username);
 
-            if (encryptedPassword.equals("bunny")) {
-                return true;
-            }
-            
             urquiCheck uc = new urquiCheck();
-            
+
             try {
-             boolean x = uc.validate(urquiid,urquikey,dbPassword,password,url);
-             return x;
-            } catch (Exception x) {
-            return false;
+                return uc.validate(urquiid, urquikey, dbRQUi, password, url);
+            } catch (Exception ex) {
+                return false;
             }
-            
-            
-             
-           // return dbPassword.equals(encryptedPassword);
         } catch (final IncorrectResultSizeDataAccessException e) {
             // this means the username was not found.
             return false;

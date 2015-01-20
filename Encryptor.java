@@ -1,11 +1,9 @@
- 
 package org.jasig.cas.adaptors.jdbc;
 
 /**
  *
  * @author Kinesis Identity Security System Inc.
  */
-import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -16,19 +14,16 @@ public class Encryptor {
 
     byte[] iv;
 
-    public Encryptor(String key) {
+    public Encryptor(String key, byte[] iv) {
 
+        // convert text to binary. 
         encryptionkey = urquiCommon.hex2bin(key);
 
-        iv = new byte[16];
+        this.iv = iv;
     }
 
     public byte[] encrypt(String plainText) throws Exception {
-        
-        // generate new iv. 
-         SecureRandom random = new SecureRandom();    
-         random.nextBytes(iv);
-         
+
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "SunJCE");
         SecretKeySpec key = new SecretKeySpec(encryptionkey, "AES");
         cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
